@@ -11,17 +11,18 @@ using ContosoUniversity.Models;
 
 namespace ContosoUniversity.Controllers
 {
-    public class CoursesController : Controller
+    public class CourseController : Controller
     {
         private SchoolContext db = new SchoolContext();
 
-        // GET: Courses
+        // GET: Course
         public ActionResult Index()
         {
-            return View(db.Courses.ToList());
+            var courses = db.Courses.Include(c => c.Department);
+            return View(courses.ToList());
         }
 
-        // GET: Courses/Details/5
+        // GET: Course/Details/5
         public ActionResult Details(int? id)
         {
             if (id == null)
@@ -36,18 +37,19 @@ namespace ContosoUniversity.Controllers
             return View(course);
         }
 
-        // GET: Courses/Create
+        // GET: Course/Create
         public ActionResult Create()
         {
+            ViewBag.DepartmentID = new SelectList(db.Departments, "DepartmentID", "Name");
             return View();
         }
 
-        // POST: Courses/Create
+        // POST: Course/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "CourseID,Title,Credits")] Course course)
+        public ActionResult Create([Bind(Include = "CourseID,Title,Credits,DepartmentID")] Course course)
         {
             if (ModelState.IsValid)
             {
@@ -56,10 +58,11 @@ namespace ContosoUniversity.Controllers
                 return RedirectToAction("Index");
             }
 
+            ViewBag.DepartmentID = new SelectList(db.Departments, "DepartmentID", "Name", course.DepartmentID);
             return View(course);
         }
 
-        // GET: Courses/Edit/5
+        // GET: Course/Edit/5
         public ActionResult Edit(int? id)
         {
             if (id == null)
@@ -71,15 +74,16 @@ namespace ContosoUniversity.Controllers
             {
                 return HttpNotFound();
             }
+            ViewBag.DepartmentID = new SelectList(db.Departments, "DepartmentID", "Name", course.DepartmentID);
             return View(course);
         }
 
-        // POST: Courses/Edit/5
+        // POST: Course/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "CourseID,Title,Credits")] Course course)
+        public ActionResult Edit([Bind(Include = "CourseID,Title,Credits,DepartmentID")] Course course)
         {
             if (ModelState.IsValid)
             {
@@ -87,10 +91,11 @@ namespace ContosoUniversity.Controllers
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
+            ViewBag.DepartmentID = new SelectList(db.Departments, "DepartmentID", "Name", course.DepartmentID);
             return View(course);
         }
 
-        // GET: Courses/Delete/5
+        // GET: Course/Delete/5
         public ActionResult Delete(int? id)
         {
             if (id == null)
@@ -105,7 +110,7 @@ namespace ContosoUniversity.Controllers
             return View(course);
         }
 
-        // POST: Courses/Delete/5
+        // POST: Course/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
